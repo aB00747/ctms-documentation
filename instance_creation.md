@@ -8,7 +8,7 @@
 - [New Instance Setup](#new-instance-setup)
 - [Server Management](#server-management)
 - [File Transfer Commands](#file-transfer-commands)
-- [Troubleshooting](#troubleshooting)F
+- [Troubleshooting](#troubleshooting)
 - [Git Operations](#git-operations)
 - [MCP Server Setup](#mcp-server-setup-for-windsurf)
 
@@ -492,5 +492,6 @@ Host github-js-leetcode
 ```
 
 ---
+
 
 *This documentation serves as a comprehensive guide for CTMS/SOMS development environment setup and daily operations. Keep it updated as processes evolve.*

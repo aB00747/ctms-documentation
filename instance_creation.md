@@ -11,6 +11,7 @@
 - [Troubleshooting](#troubleshooting)
 - [Git Operations](#git-operations)
 - [MCP Server Setup](#mcp-server-setup-for-windsurf)
+- [Git SSH Key Setup](#git-ssh-key-generation)
 
 ---
 
@@ -42,13 +43,11 @@ git clone -b main git@github.com:RealTime-Software-Solutions/migrations.git eng-
 ### Quick Setup Commands
 
 **For CTMS:**
-
 ```bash
 bash /srv/http/ctms/abhishek/setup_environment.sh
 ```
 
 **For SOMS:**
-
 ```bash
 bash /srv/http/ctms/abhishek/setup_environment_soms.sh
 ```
@@ -108,9 +107,11 @@ ln -s app/js/formbuilder/public/viewer ./pdfviewer
 
 ### Database Credentials
 
-- **Host:** `us-soms-rds-dev.cdbscgbrzbgp.us-east-2.rds.amazonaws.com`
-- **Username:** `sbox`
-- **Password:** `sbox`
+| Field | Value |
+|-------|-------|
+| **Host** | `us-soms-rds-dev.cdbscgbrzbgp.us-east-2.rds.amazonaws.com` |
+| **Username** | `sbox` |
+| **Password** | `sbox` |
 
 ### Connection Command
 
@@ -120,13 +121,13 @@ mysql -hus-soms-rds-dev.cdbscgbrzbgp.us-east-2.rds.amazonaws.com -u sbox -p
 
 ### Database Import Process
 
-1. **Prepare SQL file (remove DEFINER clauses):**
+**1. Prepare SQL file (remove DEFINER clauses):**
 
 ```bash
 sed -i 's/DEFINER[ ]*=[ ]*[^*]*\*/\*/' tmp_brpsmiami_20250902_093650_anonymized.sql
 ```
 
-1. **Import examples:**
+**2. Import examples:**
 
 ```bash
 # CTMS Database
@@ -201,30 +202,34 @@ UPDATE tblConfiguration SET Region = 'US';
 
 ### Development Server URLs
 
-- **SOMS (CTMS/edocs/eSource):** `dev.realtime-host01.com`
-- **Enterprise:** `dev-ent.realtime-host01.com`
+| Service | URL |
+|---------|-----|
+| **SOMS (CTMS/edocs/eSource)** | `dev.realtime-host01.com` |
+| **Enterprise** | `dev-ent.realtime-host01.com` |
 
 ### Server IP Addresses
 
-- **SOMS Web Dev:** `10.210.128.220`
-- **ENT Web Dev:** `10.210.128.202`
+| Server | IP Address |
+|--------|------------|
+| **SOMS Web Dev** | `10.210.128.220` |
+| **ENT Web Dev** | `10.210.128.202` |
 
 ### RDX Server Setup
 
-1. **Initial setup:**
+**1. Initial setup:**
 
 ```bash
 cd /home/abhishek
 sudo chmod -R 600 *
 ```
 
-1. **Switch to realtime user:**
+**2. Switch to realtime user:**
 
 ```bash
 sudo su realtime
 ```
 
-1. **Clone repository:**
+**3. Clone repository:**
 
 ```bash
 git clone -b main git@github.com:RealTime-Software-Solutions/ctms.git text161
@@ -317,16 +322,17 @@ git push --force-with-lease
 
 #### For Older Commits
 
-1. Start interactive rebase:
+**1. Start interactive rebase:**
 
 ```bash
 git rebase -i HEAD~n  # where n is number of commits back
 ```
 
-1. Change "pick" to "reword" for the target commit
-2. Edit the commit message in the new editor
-3. Push changes:
+#### 2. Change "pick" to "reword" for the target commit
 
+### 3. Edit the commit message in the new editor
+
+**4. Push changes:**
 ```bash
 git push --force-with-lease
 ```
@@ -382,25 +388,25 @@ php util/provision.php < /srv/http/ctms/abhishek/provision_input.txt
 
 ### Server-Side Setup
 
-1. **Connect to server:**
+**1. Connect to server:**
 
 ```bash
 ssh username@<server-ip>
 ```
 
-1. **Run initial setup:**
+**2. Run initial setup:**
 
 ```bash
 soms_dev_setup.sh setup
 ```
 
-1. **Navigate to MCP folder:**
+**3. Navigate to MCP folder:**
 
 ```bash
 cd somsMCP/
 ```
 
-1. **Configure environment:**
+**4. Configure environment:**
 
 ```bash
 nano .env
@@ -414,13 +420,13 @@ DB_USERNAME=sbox
 DB_PASSWORD=sbox
 ```
 
-1. **Test database connection:**
+**5. Test database connection:**
 
 ```bash
 php test_database_connection.php
 ```
 
-1. **Start MCP instance:**
+**6. Start MCP instance:**
 
 ```bash
 php <developername>_start.php  # Example: php tejas_start.php
@@ -428,10 +434,9 @@ php <developername>_start.php  # Example: php tejas_start.php
 
 ### Windsurf Configuration
 
-1. **Open Windsurf** → Cascade Customizations → MCP Servers → Manage Servers
+**1. Open Windsurf** → Cascade Customizations → MCP Servers → Manage Servers
 
-2. **View Raw Config** and add:
-
+**2. View Raw Config** and add:
 ```json
 {
   "mcpServers": {
@@ -446,7 +451,7 @@ php <developername>_start.php  # Example: php tejas_start.php
 }
 ```
 
-1. **Save (Ctrl+S)** → **Refresh**
+**3. Save (Ctrl+S)** → **Refresh**
 
 ### Background Process Management
 
@@ -461,11 +466,77 @@ php tejas_start.php
 
 ---
 
+## Git SSH Key Generation
+
+### 1. Check if you have SSH keys set up
+
+First, check if you have SSH keys:
+
+```bash
+ls -la ~/.ssh
+```
+
+Look for files like `id_rsa` and `id_rsa.pub` (or `id_ed25519` and `id_ed25519.pub`).
+
+### 2. Test your SSH connection to GitHub
+
+```bash
+ssh -T git@github.com
+```
+
+If this fails, you need to set up SSH keys.
+
+### 3. Set up SSH keys (if you don't have them)
+
+**Generate a new SSH key:**
+
+```bash
+ssh-keygen -t ed25519 -C "your_email@example.com"
+```
+
+**Start the SSH agent and add your key:**
+
+```bash
+eval "$(ssh-agent -s)"
+ssh-add ~/.ssh/id_ed25519
+```
+
+**Copy your public key:**
+
+```bash
+cat ~/.ssh/id_ed25519.pub
+```
+
+**Then add this public key to your GitHub account:**
+
+- Go to GitHub → Settings → SSH and GPG keys
+- Click "New SSH key"
+- Paste your public key
+
+### 4. Alternative: Switch to HTTPS
+
+If you prefer not to use SSH, you can change the remote URL to use HTTPS:
+
+```bash
+git remote set-url origin https://github.com/username/esrc1289-soms.git
+```
+
+Replace `username` with the actual GitHub username or organization name.
+
+### 5. Check repository access
+
+Make sure:
+- The repository exists and you have access to it
+- You're using the correct repository name
+- If it's a private repo, you have the necessary permissions
+
+---
+
 ## Additional Notes
 
 ### Search Pull Requests by Commit ID
 
-```
+```bash
 https://github.com/search?q=[commit-id]&type=pullrequests
 ```
 
@@ -492,6 +563,5 @@ Host github-js-leetcode
 ```
 
 ---
-
 
 *This documentation serves as a comprehensive guide for CTMS/SOMS development environment setup and daily operations. Keep it updated as processes evolve.*
